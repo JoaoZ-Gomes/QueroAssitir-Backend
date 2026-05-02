@@ -1,0 +1,9 @@
+.git
+.idea
+.mvn
+target
+*.iml
+artifacts.html
+.env
+.env.*
+HELP.md
