@@ -17,6 +17,7 @@ public class MovieResponseDTO {
     private String description;
     private String image;
     private Double rating;
+    private Integer voteCount;
     private List<String> genres;
     private String duration;
     private Integer durationMinutes;

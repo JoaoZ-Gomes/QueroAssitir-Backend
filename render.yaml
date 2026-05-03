@@ -16,3 +16,5 @@ services:
         sync: false
       - key: TMDB_API_KEY
         sync: false
+      - key: CORS_ALLOWED_ORIGIN_PATTERNS
+        sync: false

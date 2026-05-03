@@ -47,4 +47,9 @@ public class Movie {
     private Integer releaseYear;
 
     private String director;
+
+    @ElementCollection
+    @CollectionTable(name = "tb_filme_plataformas", joinColumns = @JoinColumn(name = "filme_id"))
+    @Column(name = "plataforma")
+    private List<String> platforms;
 }

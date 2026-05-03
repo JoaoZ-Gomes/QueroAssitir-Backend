@@ -21,12 +21,15 @@ public class MockTmdbClientImpl implements TmdbClient {
                     .id(movieId)
                     .title("O Guardião dos Sonhos (Original)")
                     .description("Uma aventura visual deslumbrante sobre esperança e imaginação.")
-                    .image("https://images.unsplash.com/photo-1768063748336-2864cd51fb26")
+                    .image("https://placehold.co/500x750/1a1a2e/c4b5fd?text=Mock+Movie")
                     .rating(8.5)
+                    .voteCount(1250)
                     .genres(List.of("Fantasia", "Aventura"))
                     .duration("1h 52min")
+                    .durationMinutes(112)
                     .year(2022)
                     .director("Valentina Cortes")
+                    .platforms(List.of())
                     .build());
         }
         
@@ -37,5 +40,17 @@ public class MockTmdbClientImpl implements TmdbClient {
     public Optional<MovieResponseDTO> searchMovieByTitle(String title) {
         log.info("Simulando busca por título: {}", title);
         return getMovieDetails("tmdb-mock-1");
+    }
+
+    @Override
+    public List<MovieResponseDTO> discoverMovies(List<String> genreIds, List<String> excludeIds) {
+        log.info("Discovery MOCK - retornando lista fixa de qualidade");
+        return List.of(getMovieDetails("tmdb-mock-1").get());
+    }
+
+    @Override
+    public List<MovieResponseDTO> getTrendingMovies(List<String> excludeIds) {
+        log.info("Trending MOCK - retornando lista fixa de qualidade");
+        return List.of(getMovieDetails("tmdb-mock-1").get());
     }
 }

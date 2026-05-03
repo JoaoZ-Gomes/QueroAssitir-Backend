@@ -1,5 +1,6 @@
 package com.queroassistir.backend.features.recomendacao.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.queroassistir.backend.features.recomendacao.dto.RecomendacaoRequestDTO;
 import com.queroassistir.backend.features.recomendacao.dto.RecomendacaoResponseDTO;
 import com.queroassistir.backend.features.recomendacao.service.RecomendacaoIService;
+import com.queroassistir.backend.infrastructure.response.ApiResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,9 +29,11 @@ public class RecomendacaoController {
 
     @Operation(summary = "Gera recomendações", description = "Baseado no humor e contexto, retorna uma recomendação primária e alternativas.")
     @PostMapping
-    public ResponseEntity<RecomendacaoResponseDTO> recomendar(@RequestBody @Valid RecomendacaoRequestDTO dto) {
+    public ResponseEntity<ApiResponse<RecomendacaoResponseDTO>> recomendar(@RequestBody @Valid RecomendacaoRequestDTO dto) {
         log.info("Recebida requisição de recomendação. Mood: {}, Context: {}", dto.getMood(), dto.getContext());
-        return ResponseEntity.ok(service.gerarRecomendacao(dto));
+        RecomendacaoResponseDTO resultado = service.gerarRecomendacao(dto);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.success(resultado, "Recomendação gerada com sucesso", 200));
     }
 }
 
