@@ -3,7 +3,6 @@ artifacts.html
 .env
 .env.*
 !.env.example
-src/main/resources/application.yml
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
