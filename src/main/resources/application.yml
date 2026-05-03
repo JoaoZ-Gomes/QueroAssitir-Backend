@@ -54,6 +54,10 @@ springdoc:
     operationsSorter: method
     tagsSorter: alpha
 
+app:
+  cors:
+    allowed-origin-patterns: ${CORS_ALLOWED_ORIGIN_PATTERNS:http://localhost:*,https://*.onrender.com,https://*.vercel.app}
+
 logging:
   level:
     org.springframework.ai: DEBUG
