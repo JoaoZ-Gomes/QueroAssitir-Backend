@@ -1,6 +1,7 @@
 package com.queroassistir.backend.infrastructure.integration.ai;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,9 +42,16 @@ public class GeminiAiServiceImpl implements AiService {
         "Pense em filmes que poucos recomendam mas que são excelentes.",
     };
 
-    public GeminiAiServiceImpl(org.springframework.ai.google.genai.GoogleGenAiChatModel chatModel, ObjectMapper objectMapper) {
+    public GeminiAiServiceImpl(org.springframework.ai.google.genai.GoogleGenAiChatModel chatModel, ObjectMapper objectMapper, 
+                               @Value("${spring.ai.google.genai.api-key:}") String apiKey) {
         this.chatClient = ChatClient.builder(chatModel).build();
         this.objectMapper = objectMapper;
+        
+        if (apiKey == null || apiKey.isBlank() || apiKey.equals("${GEMINI_API_KEY}")) {
+            log.error("[AI-CONFIG] CRÍTICO: API Key do Gemini não foi encontrada ou está vazia!");
+        } else {
+            log.info("[AI-CONFIG] API Key carregada com sucesso (prefixo: {}...)", apiKey.substring(0, Math.min(apiKey.length(), 5)));
+        }
     }
 
     @Override
@@ -111,12 +119,17 @@ public class GeminiAiServiceImpl implements AiService {
 
         String response = null;
         try {
+            log.info("[AI-DEBUG] Enviando requisição para o Google Gemini API...");
             response = chatClient.prompt()
                     .user(prompt)
                     .call()
                     .content();
 
-            log.info("[AI-DEBUG] Resposta recebida em {}ms", (System.currentTimeMillis() - startTime));
+            if (response == null || response.isBlank()) {
+                log.warn("[AI-DEBUG] Alerta: O Gemini retornou uma resposta vazia.");
+            }
+
+            log.info("[AI-DEBUG] Conexão com IA realizada com sucesso em {}ms", (System.currentTimeMillis() - startTime));
             log.debug("[AI-DEBUG] Payload Bruto: {}", response);
 
             String jsonCleaned = extractJson(response);
