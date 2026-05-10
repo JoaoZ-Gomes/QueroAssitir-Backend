@@ -304,9 +304,18 @@ public class RealTmdbClientImpl implements TmdbClient {
         if (tmdbMovie.getWatchProviders() != null && tmdbMovie.getWatchProviders().getResults() != null 
             && tmdbMovie.getWatchProviders().getResults().get("BR") != null) {
             TmdbCountryProviders br = tmdbMovie.getWatchProviders().getResults().get("BR");
+            
+            Set<String> uniquePlatforms = new java.util.HashSet<>();
             if (br.getFlatrate() != null) {
-                platforms = br.getFlatrate().stream().map(TmdbProvider::getProviderName).collect(Collectors.toList());
+                br.getFlatrate().forEach(p -> uniquePlatforms.add(p.getProviderName()));
             }
+            if (br.getRent() != null) {
+                br.getRent().forEach(p -> uniquePlatforms.add(p.getProviderName()));
+            }
+            if (br.getBuy() != null) {
+                br.getBuy().forEach(p -> uniquePlatforms.add(p.getProviderName()));
+            }
+            platforms.addAll(uniquePlatforms);
         }
 
         return MovieResponseDTO.builder()
@@ -379,7 +388,11 @@ public class RealTmdbClientImpl implements TmdbClient {
     }
 
     @Data @JsonIgnoreProperties(ignoreUnknown = true) public static class TmdbWatchProviders { private java.util.Map<String, TmdbCountryProviders> results; }
-    @Data @JsonIgnoreProperties(ignoreUnknown = true) public static class TmdbCountryProviders { private List<TmdbProvider> flatrate; }
+    @Data @JsonIgnoreProperties(ignoreUnknown = true) public static class TmdbCountryProviders { 
+        private List<TmdbProvider> flatrate; 
+        private List<TmdbProvider> rent; 
+        private List<TmdbProvider> buy; 
+    }
     @Data @JsonIgnoreProperties(ignoreUnknown = true) public static class TmdbProvider { @JsonProperty("provider_name") private String providerName; }
     @Data @JsonIgnoreProperties(ignoreUnknown = true) public static class TmdbCredits { private List<TmdbCrew> crew; }
     @Data @JsonIgnoreProperties(ignoreUnknown = true) public static class TmdbCrew { private String name; private String job; }
