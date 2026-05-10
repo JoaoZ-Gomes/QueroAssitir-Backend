@@ -74,7 +74,7 @@ public class ExplanationGeneratorService {
                     query,
                     movie.getTitle(),
                     String.join(", ", movie.getGenres()),
-                    movie.getOverview()
+                    movie.getDescription()
             );
 
             // Construir o prompt SYSTEM que define o comportamento
