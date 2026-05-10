@@ -25,10 +25,13 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class ExplanationGeneratorService {
 
     private final ChatClient chatClient;
+
+    public ExplanationGeneratorService(org.springframework.ai.google.genai.GoogleGenAiChatModel chatModel) {
+        this.chatClient = ChatClient.builder(chatModel).build();
+    }
 
     @Value("${app.ai.explanation.enabled:true}")
     private boolean explanationEnabled;
