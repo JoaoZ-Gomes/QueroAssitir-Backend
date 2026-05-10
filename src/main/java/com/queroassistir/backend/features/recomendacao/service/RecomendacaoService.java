@@ -119,6 +119,11 @@ public class RecomendacaoService implements RecomendacaoIService {
         if (primaryMovie == null && !discoveryMovies.isEmpty()) {
             log.info("[FALLBACK] Usando filme do discovery como principal");
             primaryMovie = discoveryMovies.remove(0);
+            
+            if (primaryMovie.getDurationMinutes() == null || primaryMovie.getDurationMinutes() == 0) {
+                primaryMovie = tmdbClient.getMovieDetails(primaryMovie.getId()).orElse(primaryMovie);
+            }
+            
             matchReason = "Selecionado com base no seu humor e nas tendências atuais.";
         }
 
@@ -168,6 +173,20 @@ public class RecomendacaoService implements RecomendacaoIService {
 
         // Shuffle final nas alternativas para garantir variedade
         Collections.shuffle(finalAlternatives);
+
+        // Garantir que todos os filmes finais tenham duração (filmes do discovery vêm sem runtime)
+        List<MovieResponseDTO> fullyPopulatedAlternatives = new ArrayList<>();
+        for (MovieResponseDTO alt : finalAlternatives) {
+            if (alt.getDurationMinutes() == null || alt.getDurationMinutes() == 0) {
+                tmdbClient.getMovieDetails(alt.getId()).ifPresentOrElse(
+                    fullyPopulatedAlternatives::add,
+                    () -> fullyPopulatedAlternatives.add(alt)
+                );
+            } else {
+                fullyPopulatedAlternatives.add(alt);
+            }
+        }
+        finalAlternatives = fullyPopulatedAlternatives;
 
         // 3. Montar a resposta final
         if (matchReason == null || matchReason.isBlank()) {

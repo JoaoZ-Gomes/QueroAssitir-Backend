@@ -279,7 +279,18 @@ public class RealTmdbClientImpl implements TmdbClient {
 
         String imageUrl = buildImageUrl(tmdbMovie.getPosterPath());
         int durationMin = tmdbMovie.getRuntime() != null ? tmdbMovie.getRuntime() : 0;
-        String durationStr = durationMin > 0 ? (durationMin / 60) + "h " + (durationMin % 60) + "min" : "Duração indisponível";
+        String durationStr = "Duração indisponível";
+        if (durationMin > 0) {
+            int hours = durationMin / 60;
+            int mins = durationMin % 60;
+            if (hours > 0 && mins > 0) {
+                durationStr = hours + "h " + mins + "min";
+            } else if (hours > 0) {
+                durationStr = hours + "h";
+            } else {
+                durationStr = mins + "min";
+            }
+        }
 
         String director = "Desconhecido";
         if (tmdbMovie.getCredits() != null && tmdbMovie.getCredits().getCrew() != null) {
