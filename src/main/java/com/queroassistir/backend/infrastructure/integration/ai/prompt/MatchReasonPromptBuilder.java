@@ -143,8 +143,11 @@ public class MatchReasonPromptBuilder {
                 4. Nunca repita as palavras do mood ou contexto
                 5. Seja memorável mas breve
                 
-                Responda APENAS COM a explicação. Sem aspas, sem marcadores, sem JSON.
-                Máximo 150 caracteres (contando espaços).
+                FORMATO DE RESPOSTA OBRIGATÓRIO:
+                Retorne APENAS um JSON válido. Não inclua marcação markdown ou texto adicional.
+                {
+                  "explanation": "Sua explicação com no máximo 150 caracteres"
+                }
                 """,
                 getMoodLabel(mood),
                 getContextLabel(context),

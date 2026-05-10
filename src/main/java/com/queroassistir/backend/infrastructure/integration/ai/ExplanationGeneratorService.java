@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.queroassistir.backend.features.filme.dto.MovieResponseDTO;
 import com.queroassistir.backend.infrastructure.integration.ai.prompt.MatchReasonPromptBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,13 +27,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ExplanationGeneratorService {
 
     private final ChatClient chatClient;
-
-    public ExplanationGeneratorService(org.springframework.ai.google.genai.GoogleGenAiChatModel chatModel) {
-        this.chatClient = ChatClient.builder(chatModel).build();
-    }
+    private final ObjectMapper objectMapper;
 
     @Value("${app.ai.explanation.enabled:true}")
     private boolean explanationEnabled;
@@ -87,7 +87,7 @@ public class ExplanationGeneratorService {
             log.trace("[EXPLANATION-PROMPT-CONTENT] {}", systemPrompt);
 
             // Executar chamada para o Gemini com temperatura personalizada
-            explanation = chatClient.prompt()
+            String response = chatClient.prompt()
                     .system(systemPrompt)
                     .user(userPrompt)
                     .call()
@@ -95,8 +95,23 @@ public class ExplanationGeneratorService {
 
             long duration_ms = System.currentTimeMillis() - startTime;
 
-            // Log de sucesso
-            if (explanation != null && !explanation.isBlank()) {
+            // Extrair JSON
+            if (response != null && !response.isBlank()) {
+                String cleanJson = response.replaceAll("```json", "").replaceAll("```", "").trim();
+                try {
+                    JsonNode root = objectMapper.readTree(cleanJson);
+                    if (root.has("explanation")) {
+                        explanation = root.get("explanation").asText();
+                    } else if (root.has("matchReason")) {
+                        explanation = root.get("matchReason").asText();
+                    } else {
+                        explanation = cleanJson;
+                    }
+                } catch (Exception e) {
+                    log.warn("[EXPLANATION] Resposta não era um JSON válido, usando o texto puro. Resposta: {}", cleanJson);
+                    explanation = cleanJson;
+                }
+                
                 explanation = explanation.trim().replaceAll("^[\"']|[\"']$", "");
                 
                 log.info("[EXPLANATION-SUCCESS] Gerada em {}ms para '{}' | Tamanho: {} chars",
