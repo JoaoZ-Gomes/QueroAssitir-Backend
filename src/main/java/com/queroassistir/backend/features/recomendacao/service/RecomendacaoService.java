@@ -15,6 +15,7 @@ import com.queroassistir.backend.features.filme.dto.MovieResponseDTO;
 import com.queroassistir.backend.features.recomendacao.dto.RecomendacaoRequestDTO;
 import com.queroassistir.backend.features.recomendacao.dto.RecomendacaoResponseDTO;
 import com.queroassistir.backend.infrastructure.integration.ai.AiService;
+import com.queroassistir.backend.infrastructure.integration.ai.ExplanationGeneratorService;
 import com.queroassistir.backend.infrastructure.integration.tmdb.TmdbClient;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class RecomendacaoService implements RecomendacaoIService {
 
     private final AiService aiService;
     private final TmdbClient tmdbClient;
+    private final ExplanationGeneratorService explanationGenerator;
 
     /**
      * Mapeamento de mood → gêneros TMDB para discovery.
@@ -123,6 +125,22 @@ public class RecomendacaoService implements RecomendacaoIService {
         // Se AINDA não tem filme principal, erro
         if (primaryMovie == null) {
             throw new RuntimeException("Não foi possível encontrar nenhum filme para recomendar. Tente novamente.");
+        }
+
+        // ===== FASE 4: Gerar explicação personalizada =====
+        // Gerar uma explicação humanizada e contextualizada para a recomendação
+        try {
+            matchReason = explanationGenerator.generateMatchReason(
+                    primaryMovie,
+                    request.getMood(),
+                    request.getContext(),
+                    request.getDuration(),
+                    request.getQuery()
+            );
+            log.info("[EXPLANATION] Gerada com sucesso: {}", matchReason);
+        } catch (Exception e) {
+            log.warn("[EXPLANATION] Erro ao gerar explicação personalizada, usando fallback: {}", e.getMessage());
+            // matchReason já possui um fallback básico
         }
 
         // Combinar alternativas: AI + Discovery, sem duplicatas

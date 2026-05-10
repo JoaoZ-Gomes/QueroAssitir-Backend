@@ -57,6 +57,21 @@ springdoc:
 app:
   cors:
     allowed-origin-patterns: ${CORS_ALLOWED_ORIGIN_PATTERNS:http://localhost:*,https://*.onrender.com,https://*.vercel.app}
+  
+  # ============================================================
+  # CONFIGURAÇÃO DE IA GENERATIVA PARA EXPLICAÇÕES
+  # ============================================================
+  ai:
+    explanation:
+      # Habilita/desabilita geração de explicações personalizadas
+      enabled: ${AI_EXPLANATION_ENABLED:true}
+      
+      # Temperatura para o Gemini (0.0 = determinístico, 1.0 = criativo)
+      # Valores:
+      # - 0.3-0.5: Respostas consistentes e previsíveis
+      # - 0.7-0.8: Variedade moderada (RECOMENDADO para explicações)
+      # - 0.9-1.0: Muito criativo mas pode ser incoerente
+      temperature: ${AI_EXPLANATION_TEMPERATURE:0.8}
 
 logging:
   level:
