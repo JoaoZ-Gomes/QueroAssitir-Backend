@@ -1,6 +1,7 @@
 package com.queroassistir.backend.infrastructure.integration.ai;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,7 @@ public class GeminiAiServiceImpl implements AiService {
         "Pense em filmes que poucos recomendam mas que são excelentes.",
     };
 
-    public GeminiAiServiceImpl(org.springframework.ai.google.genai.GoogleGenAiChatModel chatModel, ObjectMapper objectMapper, 
+    public GeminiAiServiceImpl(ChatModel chatModel, ObjectMapper objectMapper, 
                                @Value("${spring.ai.google.genai.api-key:}") String apiKey) {
         this.chatClient = ChatClient.builder(chatModel).build();
         this.objectMapper = objectMapper;

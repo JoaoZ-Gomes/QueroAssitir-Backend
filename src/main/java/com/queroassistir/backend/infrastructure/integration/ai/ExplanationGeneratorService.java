@@ -1,6 +1,7 @@
 package com.queroassistir.backend.infrastructure.integration.ai;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.queroassistir.backend.features.filme.dto.MovieResponseDTO;
@@ -32,7 +33,7 @@ public class ExplanationGeneratorService {
     private final ChatClient chatClient;
     private final ObjectMapper objectMapper;
 
-    public ExplanationGeneratorService(org.springframework.ai.google.genai.GoogleGenAiChatModel chatModel, ObjectMapper objectMapper) {
+    public ExplanationGeneratorService(ChatModel chatModel, ObjectMapper objectMapper) {
         this.chatClient = ChatClient.builder(chatModel).build();
         this.objectMapper = objectMapper;
     }
